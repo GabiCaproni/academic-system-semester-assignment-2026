@@ -4,11 +4,11 @@
  */
 package org.example.academic.system.model;
 
-public class PracticaAssignment extends Assessment {
+public class PracticalAssignment extends Assessment {
 
     private String technology;
 
-    public PracticaAssignment(String name, double weight, double value, String technology) {
+    public PracticalAssignment(String name, double weight, double value, String technology) {
         super(name, weight, value);
         this.technology = technology;
     }

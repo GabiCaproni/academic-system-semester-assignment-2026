@@ -18,4 +18,16 @@ public abstract class Assessment {
         this.weight = weight;
         this.value = value;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public double getValue() {
+        return value;
+    }
 }
