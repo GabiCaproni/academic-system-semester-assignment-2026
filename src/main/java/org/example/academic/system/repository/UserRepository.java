@@ -8,12 +8,15 @@ package org.example.academic.system.repository;
  *
  * @author Gabi Caproni
  */
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.example.academic.system.model.Role;
 import org.example.academic.system.model.User;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class UserRepository {
 
@@ -21,19 +24,54 @@ public class UserRepository {
 
     public UserRepository() {
 
-        users.add(new User("admin", "123", Role.ADMIN));
-        users.add(new User("professor", "123", Role.PROFESSOR));
+        loadUsers();
     }
 
     public User findByUsername(String username) {
 
-        for(User user : users) {
+        for (User user : users) {
 
-            if(user.getUsername().equals(username)) {
+            if (user.getUsername().equals(username)) {
                 return user;
             }
         }
 
         return null;
+    }
+
+    private void loadUsers() {
+
+        File file = new File("users.txt");
+
+        System.out.println("Procurando arquivo em:");
+        System.out.println(file.getAbsolutePath());
+        System.out.println("Existe? " + file.exists());
+
+        try (BufferedReader reader
+                = new BufferedReader(
+                        new FileReader("user.txt"))) {
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] data = line.split(";");
+
+                String username = data[0];
+                String password = data[1];
+                Role role = Role.valueOf(data[2]);
+
+                users.add(
+                        new User(
+                                username,
+                                password,
+                                role));
+            }
+
+        } catch (IOException e) {
+
+            System.out.println(
+                    "Erro ao carregar usuários.");
+        }
     }
 }

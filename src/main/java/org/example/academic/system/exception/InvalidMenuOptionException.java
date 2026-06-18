@@ -9,10 +9,12 @@ package org.example.academic.system.exception;
  * @author Gabi Caproni
  */
 
-public class AcademicSystemException
-        extends RuntimeException {
+public class InvalidMenuOptionException
+        extends KeyboardInputException {
 
-    public AcademicSystemException(String message) {
+    public InvalidMenuOptionException(
+            String message) {
+
         super(message);
     }
 }

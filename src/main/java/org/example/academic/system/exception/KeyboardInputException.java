@@ -9,10 +9,12 @@ package org.example.academic.system.exception;
  * @author Gabi Caproni
  */
 
-public class AcademicSystemException
-        extends RuntimeException {
+public class KeyboardInputException
+        extends Exception {
 
-    public AcademicSystemException(String message) {
+    public KeyboardInputException(
+            String message) {
+
         super(message);
     }
 }

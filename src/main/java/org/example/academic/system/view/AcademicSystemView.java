@@ -6,6 +6,7 @@ import org.example.academic.system.controller.AuthenticationController;
 import org.example.academic.system.exception.AcademicSystemException;
 import org.example.academic.system.exception.AuthenticationException;
 import org.example.academic.system.exception.AuthorizationException;
+import org.example.academic.system.exception.InvalidNumericInputException;
 import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.model.Assessment;
 import org.example.academic.system.model.Assignment;
@@ -14,7 +15,9 @@ import org.example.academic.system.model.PracticalAssignment;
 import org.example.academic.system.model.Role;
 import org.example.academic.system.model.Seminar;
 import org.example.academic.system.model.User;
-import org.example.academic.system.security.AuthorizationService;
+import org.example.academic.system.service.AuthorizationService;
+import org.example.academic.system.exception.InvalidMenuOptionException;
+import org.example.academic.system.exception.KeyboardInputException;
 
 public class AcademicSystemView {
 
@@ -32,68 +35,123 @@ public class AcademicSystemView {
 
     public void start() {
 
-        boolean running = true;
+    while (true) {
 
-        while (running) {
+        login();
 
-            login();
+        while (authController.getLoggedUser() != null) {
 
-            int option;
-
-            do {
+            try {
 
                 showMenu();
 
-                option = readInt();
+                int option = readInt();
 
-                User user = authController.getLoggedUser();
+                User user =
+                        authController.getLoggedUser();
 
-                switch (option) {
+                if (user.getRole() == Role.ADMIN) {
 
-                    case 1:
-                        registerClass();
-                        break;
+                    switch (option) {
 
-                    case 2:
-                        registerAssessment();
-                        break;
+                        case 1:
+                            registerClass();
+                            break;
 
-                    case 3:
-                        generateSummary();
-                        break;
+                        case 2:
+                            registerAssessment();
+                            break;
 
-                    case 4:
-                        generateWeight();
-                        break;
+                        case 3:
+                            generateSummary();
+                            break;
 
-                    case 0:
-                        logout();
-                        break;
+                        case 4:
+                            generateWeight();
+                            break;
 
-                    case 9:
-                        authController.logout();
-                        System.out.println("Sistema encerrado.");
-                        System.exit(0);
-                        break;
+                        case 5:
+                            logout();
+                            break;
 
-                    default:
-                        System.out.println("Opção inválida.");
+                        case 9:
+                            authController.logout();
+                            System.out.println(
+                                    "Sistema encerrado.");
+                            System.exit(0);
+                            break;
+
+                        default:
+                            throw new InvalidMenuOptionException(
+                                    "Opção inválida.");
+                    }
+
+                } else {
+
+                    switch (option) {
+
+                        case 1:
+                            registerAssessment();
+                            break;
+
+                        case 2:
+                            generateSummary();
+                            break;
+
+                        case 3:
+                            generateWeight();
+                            break;
+
+                        case 4:
+                            logout();
+                            break;
+
+                        case 9:
+                            authController.logout();
+                            System.out.println(
+                                    "Sistema encerrado.");
+                            System.exit(0);
+                            break;
+
+                        default:
+                            throw new InvalidMenuOptionException(
+                                    "Opção inválida.");
+                    }
                 }
 
-            } while (option != 0 && option != 9);
+            } catch (KeyboardInputException e) {
+
+                System.out.println(
+                        "Erro: "
+                        + e.getMessage());
+            }
         }
     }
+}
 
     private void showMenu() {
 
+        User user = authController.getLoggedUser();
+
         System.out.println("\n===== MENU =====");
 
-        System.out.println("1 - Cadastrar turma");
-        System.out.println("2 - Registrar avaliação");
-        System.out.println("3 - Relatório resumido");
-        System.out.println("4 - Relatório de pesos");
-        System.out.println("0 - Logout");
-        System.out.println("9 - Sair do sistema");
+        if (user.getRole() == Role.ADMIN) {
+
+            System.out.println("1 - Cadastrar turma");
+            System.out.println("2 - Registrar avaliação");
+            System.out.println("3 - Relatório resumido");
+            System.out.println("4 - Relatório de pesos");
+            System.out.println("5 - Logout");
+            System.out.println("9 - Sair do sistema");
+
+        } else {
+
+            System.out.println("1 - Registrar avaliação");
+            System.out.println("2 - Relatório resumido");
+            System.out.println("3 - Relatório de pesos");
+            System.out.println("4 - Logout");
+            System.out.println("9 - Sair do sistema");
+        }
     }
 
     private void login() {
@@ -142,27 +200,37 @@ public class AcademicSystemView {
 
     private void registerAssessment() {
 
+    try {
+
         if (academicController.getClasses().isEmpty()) {
 
-            System.out.println("Nenhuma turma cadastrada.");
+            System.out.println(
+                    "Nenhuma turma cadastrada.");
             return;
         }
 
-        System.out.println("\nTurmas disponíveis:");
+        System.out.println(
+                "\nTurmas disponíveis:");
 
-        for (int i = 0; i < academicController.getClasses().size(); i++) {
+        for (int i = 0;
+                i < academicController.getClasses().size();
+                i++) {
 
-            AcademicClass academicClass
-                    = academicController.getClasses().get(i);
+            AcademicClass academicClass =
+                    academicController.getClasses().get(i);
 
             System.out.println(
-                    (i + 1) + " - "
+                    (i + 1)
+                    + " - "
                     + academicClass.getName());
         }
 
-        System.out.print("Escolha a turma: ");
-        int classIndex = readInt() - 1;
+        System.out.print(
+                "Escolha a turma: ");
 
+        int classIndex =
+                readInt() - 1;
+        
         if (classIndex < 0
                 || classIndex >= academicController.getClasses().size()) {
 
@@ -250,9 +318,19 @@ public class AcademicSystemView {
 
             System.out.println(
                     "Erro: " + e.getMessage());
-        }
-    }
+        }    } catch (KeyboardInputException e) {
 
+        System.out.println(
+                "Erro: "
+                + e.getMessage());
+
+    } catch (AcademicSystemException e) {
+
+        System.out.println(
+                "Erro: "
+                + e.getMessage());
+    }
+}
     
 
     private void registerClass() {
@@ -325,40 +403,47 @@ public class AcademicSystemView {
 
     private void logout() {
 
+        User user = authController.getLoggedUser();
+
+        System.out.println(
+                "[LOG] Usuário "
+                + user.getUsername()
+                + " realizou logout.");
+
         authController.logout();
-        System.out.println("Logout realizado com sucesso.");
+
+        System.out.println(
+                "Logout realizado com sucesso.");
     }
 
-    private int readInt() {
+    private int readInt()
+        throws InvalidNumericInputException {
 
-        while (true) {
+    try {
 
-            try {
+        return Integer.parseInt(
+                scanner.nextLine());
 
-                return Integer.parseInt(scanner.nextLine());
+    } catch (NumberFormatException e) {
 
-            } catch (NumberFormatException e) {
-
-                System.out.println(
-                        "Entrada inválida. Digite um número:");
-            }
-        }
+        throw new InvalidNumericInputException(
+                "Digite um número válido.");
     }
+}
 
-    private double readDouble() {
+    private double readDouble()
+        throws InvalidNumericInputException {
 
-        while (true) {
+    try {
 
-            try {
+        return Double.parseDouble(
+                scanner.nextLine());
 
-                return Double.parseDouble(scanner.nextLine());
+    } catch (NumberFormatException e) {
 
-            } catch (NumberFormatException e) {
-
-                System.out.println(
-                        "Entrada inválida. Digite um valor numérico:");
-            }
-        }
+        throw new InvalidNumericInputException(
+                "Digite um valor numérico válido.");
     }
+}
 
 }

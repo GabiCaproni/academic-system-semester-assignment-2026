@@ -8,9 +8,7 @@ package org.example.academic.system.exception;
  *
  * @author Gabi Caproni
  */
-import org.example.academic.system.security.AuthorizationService;
-
-public class AuthorizationException extends Exception{
+public class AuthorizationException extends SecurityException{
     
     public AuthorizationException(String message) {
         super(message);

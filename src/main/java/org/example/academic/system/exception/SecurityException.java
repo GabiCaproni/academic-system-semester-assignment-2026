@@ -9,10 +9,9 @@ package org.example.academic.system.exception;
  * @author Gabi Caproni
  */
 
-public class AcademicSystemException
-        extends RuntimeException {
+public class SecurityException extends Exception {
 
-    public AcademicSystemException(String message) {
+    public SecurityException(String message) {
         super(message);
     }
 }

@@ -9,10 +9,13 @@ package org.example.academic.system.exception;
  * @author Gabi Caproni
  */
 
-public class AcademicSystemException
-        extends RuntimeException {
+public class InvalidNumericInputException
+        extends KeyboardInputException {
 
-    public AcademicSystemException(String message) {
+    public InvalidNumericInputException(
+            String message) {
+
         super(message);
     }
 }
+

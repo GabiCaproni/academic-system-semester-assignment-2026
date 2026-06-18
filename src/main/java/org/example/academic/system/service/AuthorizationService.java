@@ -8,6 +8,8 @@ package org.example.academic.system.service;
  *
  * @author Gabi Caproni
  */
+
+import org.example.academic.system.exception.AuthorizationException;
 import org.example.academic.system.model.Role;
 import org.example.academic.system.model.User;
 
@@ -15,11 +17,31 @@ public class AuthorizationService {
 
     public boolean isAdmin(User user) {
 
-        return user.getRole() == Role.ADMIN;
+        return user != null
+                && user.getRole() == Role.ADMIN;
     }
 
     public boolean isProfessor(User user) {
 
-        return user.getRole() == Role.PROFESSOR;
+        return user != null
+                && user.getRole() == Role.PROFESSOR;
+    }
+
+    public void authorize(
+            User user,
+            Role requiredRole)
+            throws AuthorizationException {
+
+        if (user == null) {
+
+            throw new AuthorizationException(
+                    "Usuário não autenticado.");
+        }
+
+        if (user.getRole() != requiredRole) {
+
+            throw new AuthorizationException(
+                    "Acesso negado.");
+        }
     }
 }

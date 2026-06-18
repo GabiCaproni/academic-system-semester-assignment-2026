@@ -9,10 +9,12 @@ package org.example.academic.system.exception;
  * @author Gabi Caproni
  */
 
-public class AcademicSystemException
-        extends RuntimeException {
+public class InvalidAcademicClassException
+        extends AcademicSystemException {
 
-    public AcademicSystemException(String message) {
+    public InvalidAcademicClassException(
+            String message) {
+
         super(message);
     }
 }
