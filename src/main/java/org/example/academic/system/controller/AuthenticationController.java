@@ -50,4 +50,4 @@ public class AuthenticationController {
     public User getLoggedUser() {
         return session.getLoggedUser();
     }
-}
+} 
