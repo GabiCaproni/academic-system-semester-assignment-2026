@@ -1,13 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.controller;
-
-/**
- *
- * @author Gabi Caproni
- */
 
 import java.util.List;
 import org.example.academic.system.model.AcademicClass;
@@ -22,7 +13,10 @@ public class AcademicSystemController {
     private final AssessmentService assessmentService;
     private final ReportService reportService;
 
-    public AcademicSystemController(AcademicClassService classService, AssessmentService assessmentService, ReportService reportService) {
+    public AcademicSystemController(
+            AcademicClassService classService,
+            AssessmentService assessmentService,
+            ReportService reportService) {
 
         this.classService = classService;
         this.assessmentService = assessmentService;
@@ -32,7 +26,8 @@ public class AcademicSystemController {
     public void registerClass(
             AcademicClass academicClass) {
 
-        classService.registerClass(academicClass);
+        classService.registerClass(
+                academicClass);
     }
 
     public void registerAssessment(
@@ -49,6 +44,18 @@ public class AcademicSystemController {
         return classService.getClasses();
     }
 
+    public AcademicClass findClassByCode(
+            String code) {
+
+        return classService.findClassByCode(
+                code);
+    }
+
+    public void saveClasses() {
+
+        classService.saveClasses();
+    }
+
     public String generateSummary() {
 
         return reportService.generateSummary(
@@ -59,5 +66,11 @@ public class AcademicSystemController {
 
         return reportService.generateWeightReport(
                 classService.getClasses());
+    }
+
+    public String generatePersistenceConfigurationReport() {
+
+        return reportService
+                .generatePersistenceConfigurationReport();
     }
 }

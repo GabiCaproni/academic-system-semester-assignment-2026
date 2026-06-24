@@ -2,6 +2,7 @@ package org.example.academic.system;
 
 import org.example.academic.system.controller.AcademicSystemController;
 import org.example.academic.system.controller.AuthenticationController;
+import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.repository.AcademicClassRepository;
 import org.example.academic.system.repository.UserRepository;
 import org.example.academic.system.security.SessionManager;
@@ -35,7 +36,8 @@ public class Main {
                         classRepository);
 
         ReportService reportService =
-                new ReportService();
+                new ReportService(
+                        sessionManager);
 
         // Controllers
         AuthenticationController authController =
@@ -54,6 +56,18 @@ public class Main {
                 new AcademicSystemView(
                         authController,
                         academicController);
+
+        AcademicClass turma =
+        new AcademicClass(
+                "POO001",
+                "Programacao");
+
+academicController.registerClass(
+        turma);
+
+academicController.saveClasses();
+
+System.out.println("Arquivo salvo!"); 
 
         // Inicia o sistema
         view.start();

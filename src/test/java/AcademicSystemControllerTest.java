@@ -1,19 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
-/**
- *
- * @author Gabi Caproni
- */
-
-import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.controller.AcademicSystemController;
+import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.model.Assessment;
 import org.example.academic.system.model.Exam;
+import org.example.academic.system.model.Role;
+import org.example.academic.system.model.User;
 import org.example.academic.system.repository.AcademicClassRepository;
+import org.example.academic.system.security.SessionManager;
 import org.example.academic.system.service.AcademicClassService;
 import org.example.academic.system.service.AssessmentService;
 import org.example.academic.system.service.ReportService;
@@ -23,6 +15,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AcademicSystemControllerTest {
+
+    private ReportService createReportService() {
+
+        SessionManager sessionManager =
+                new SessionManager();
+
+        User user =
+                new User(
+                        "admin",
+                        "123",
+                        Role.ADMIN);
+
+        sessionManager.login(user);
+
+        return new ReportService(
+                sessionManager);
+    }
 
     @Test
     void shouldRegisterClass() {
@@ -39,7 +48,7 @@ public class AcademicSystemControllerTest {
                         repository);
 
         ReportService reportService =
-                new ReportService();
+                createReportService();
 
         AcademicSystemController controller =
                 new AcademicSystemController(
@@ -75,7 +84,7 @@ public class AcademicSystemControllerTest {
                         repository);
 
         ReportService reportService =
-                new ReportService();
+                createReportService();
 
         AcademicSystemController controller =
                 new AcademicSystemController(
@@ -121,7 +130,7 @@ public class AcademicSystemControllerTest {
                         repository);
 
         ReportService reportService =
-                new ReportService();
+                createReportService();
 
         AcademicSystemController controller =
                 new AcademicSystemController(
@@ -150,7 +159,7 @@ public class AcademicSystemControllerTest {
                         repository);
 
         ReportService reportService =
-                new ReportService();
+                createReportService();
 
         AcademicSystemController controller =
                 new AcademicSystemController(

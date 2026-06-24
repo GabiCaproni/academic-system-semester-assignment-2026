@@ -1,35 +1,54 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package org.example.academic.system.service;
 
-/**
- *
- * @author Gabi Caproni
- */
 import java.util.List;
 import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.model.Assessment;
+import org.example.academic.system.security.SessionManager;
 
 public class ReportService {
+
+    private SessionManager sessionManager;
+    private ReportLogService logService;
+
+    public ReportService(
+            SessionManager sessionManager) {
+
+        this.sessionManager = sessionManager;
+        this.logService = new ReportLogService();
+    }
 
     public String generateSummary(
             List<AcademicClass> classes) {
 
-        StringBuilder report
-                = new StringBuilder();
+        if (sessionManager != null
+                && sessionManager.isAuthenticated()) {
+
+            logService.registerLog(
+                    "SUMMARY_REPORT",
+                    sessionManager
+                            .getLoggedUser()
+                            .getRole()
+                            .toString());
+        }
+
+        StringBuilder report =
+                new StringBuilder();
 
         for (AcademicClass c : classes) {
 
             report.append("Turma: ")
+                    .append(c.getCode())
+                    .append(" - ")
                     .append(c.getName())
                     .append("\n");
 
             for (Assessment a
                     : c.getAssessments()) {
 
-                report.append(a.getName())
+                report.append(a.getClass()
+                               .getSimpleName())
+                        .append(" | ")
+                        .append(a.getName())
                         .append(" | Peso: ")
                         .append(a.getWeight())
                         .append(" | Valor: ")
@@ -46,7 +65,19 @@ public class ReportService {
     public String generateWeightReport(
             List<AcademicClass> classes) {
 
-        StringBuilder report = new StringBuilder();
+        if (sessionManager != null
+                && sessionManager.isAuthenticated()) {
+
+            logService.registerLog(
+                    "WEIGHT_REPORT",
+                    sessionManager
+                            .getLoggedUser()
+                            .getRole()
+                            .toString());
+        }
+
+        StringBuilder report =
+                new StringBuilder();
 
         for (AcademicClass c : classes) {
 
@@ -72,5 +103,21 @@ public class ReportService {
         }
 
         return report.toString();
+    }
+
+    public String generatePersistenceConfigurationReport() {
+
+        if (sessionManager != null
+                && sessionManager.isAuthenticated()) {
+
+            logService.registerLog(
+                    "PERSISTENCE_CONFIGURATION_REPORT",
+                    sessionManager
+                            .getLoggedUser()
+                            .getRole()
+                            .toString());
+        }
+
+        return "Persistence Type: MEMORY";
     }
 }

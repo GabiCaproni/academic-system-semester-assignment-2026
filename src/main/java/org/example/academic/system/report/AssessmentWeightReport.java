@@ -1,25 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.report;
 
 import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.model.Assessment;
+import org.example.academic.system.model.Role;
 
-/**
- *
- * @author Gabi Caproni
- */
 public class AssessmentWeightReport {
 
-    public String generate(AcademicClass academicClass) {
+    private final ReportLog log =
+            new ReportLog();
 
-        StringBuilder sb = new StringBuilder();
+    public String generate(
+            AcademicClass academicClass,
+            Role role) {
+
+        log.log(
+                "WEIGHT_REPORT",
+                role);
+
+        StringBuilder sb =
+                new StringBuilder();
 
         double totalWeight = 0;
 
-        for (Assessment a : academicClass.getAssessments()) {
+        for (Assessment a
+                : academicClass.getAssessments()) {
 
             sb.append(a.getName())
               .append(" - ")

@@ -4,39 +4,28 @@ import java.util.List;
 import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.repository.AcademicClassRepository;
 
-public class AcademicClassService {
+public class ClassServiceImpl
+        implements ClassService {
 
     private final AcademicClassRepository repository;
 
-    public AcademicClassService(
+    public ClassServiceImpl(
             AcademicClassRepository repository) {
 
         this.repository = repository;
     }
 
+    @Override
     public void registerClass(
             AcademicClass academicClass) {
 
         repository.save(
                 academicClass);
-
-        repository.saveToTxt();
     }
 
-    public List<AcademicClass> getClasses() {
+    @Override
+    public List<AcademicClass> getAllClasses() {
 
         return repository.findAll();
-    }
-
-    public AcademicClass findClassByCode(
-            String code) {
-
-        return repository.findByCode(
-                code);
-    }
-
-    public void saveClasses() {
-
-        repository.saveToTxt();
     }
 }

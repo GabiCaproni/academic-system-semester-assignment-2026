@@ -9,7 +9,7 @@ package org.example.academic.system.exception;
  * @author Gabi Caproni
  */
 
-public class SecurityException extends Exception {
+public class SecurityException extends RuntimeException {
 
     public SecurityException(String message) {
         super(message);
