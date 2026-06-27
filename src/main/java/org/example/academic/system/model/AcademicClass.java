@@ -1,21 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.model;
 
-/**
- *
- * @author Gabi Caproni
- */
+import jakarta.validation.constraints.NotBlank;
 import org.example.academic.system.exception.InvalidAcademicClassException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class AcademicClass {
 
+    @NotBlank(message = "Código da turma é obrigatório.")
     private String code;
+
+    @NotBlank(message = "Nome da turma é obrigatório.")
     private String name;
+
     private List<Assessment> assessments;
 
     public AcademicClass(String code, String name) {
@@ -53,8 +51,23 @@ public class AcademicClass {
 
     @Override
     public String toString() {
-
         return code + " - " + name;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        AcademicClass other = (AcademicClass) obj;
+        return code.equals(other.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
 }

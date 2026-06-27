@@ -1,19 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.model;
 
-/**
- *
- * @author Gabi Caproni
- */
-
 public class User {
-    
+
     private String username;
     private String password;
-    private Role role; //função
+    private Role role;
 
     public User(String username, String password, Role role) {
         this.username = username;
@@ -32,6 +23,17 @@ public class User {
     public Role getRole() {
         return role;
     }
-    
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User other = (User) obj;
+        return username.equals(other.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
 }

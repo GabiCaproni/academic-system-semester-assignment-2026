@@ -1,6 +1,7 @@
 package org.example.academic.system.controller;
 
 import org.example.academic.system.exception.AuthenticationException;
+import org.example.academic.system.logging.ApplicationLogger;
 import org.example.academic.system.model.User;
 import org.example.academic.system.repository.UserRepository;
 import org.example.academic.system.security.SessionManager;
@@ -27,23 +28,33 @@ public class AuthenticationController {
                 repository.findByUsername(username);
 
         if (user == null) {
-
+            ApplicationLogger.warn(
+                    "LOGIN_FAILED - user not found: " + username);
             throw new AuthenticationException(
                     "Usuário não encontrado.");
         }
 
         if (!user.getPassword().equals(password)) {
-
+            ApplicationLogger.warn(
+                    "LOGIN_FAILED - wrong password for user: " + username);
             throw new AuthenticationException(
                     "Senha inválida.");
         }
 
         session.login(user);
+        ApplicationLogger.info(
+                "LOGIN_SUCCESS - user: " + username
+                + " role: " + user.getRole());
 
         return true;
     }
 
-    public void logout() {
+     public void logout() {
+        User user = session.getLoggedUser();
+        if (user != null) {
+            ApplicationLogger.info(
+                    "LOGOUT - user: " + user.getUsername());
+        }
         session.logout();
     }
 

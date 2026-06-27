@@ -14,7 +14,12 @@ import org.example.academic.system.context.ApplicationContext;
 import org.example.academic.system.model.Role;
 import org.example.academic.system.model.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ReportController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @FXML
     private Button btnPersistencia;
@@ -26,33 +31,34 @@ public class ReportController {
     private User usuarioLogado;
 
     public void setAcademicController(AcademicSystemController academicController) {
-        // Se recebeu null, tenta recuperar do contexto
         if (academicController == null) {
-            System.out.println("ReportController recebeu AcademicController NULL! Recuperando do ApplicationContext...");
+            logger.warn("ReportController recebeu AcademicController NULL! Recuperando do ApplicationContext...");
             this.academicController = ApplicationContext.getInstance().getAcademicController();
-            System.out.println("ReportController recuperou: " + this.academicController);
+            logger.info("ReportController recuperou AcademicController: {}", this.academicController);
         } else {
             this.academicController = academicController;
-            System.out.println("ReportController recebeu AcademicController: " + academicController);
+            logger.debug("ReportController recebeu AcademicController: {}", academicController);
         }
-        
-        // Verifica se o controller está funcionando
+
         if (this.academicController != null) {
-            System.out.println("Total de turmas disponíveis: " + this.academicController.getClasses().size());
+            logger.info("Total de turmas disponíveis no ReportController: {}", 
+                       this.academicController.getClasses().size());
         }
     }
 
     public void configurarUsuario(User user) {
         this.usuarioLogado = user;
-        System.out.println("ReportController configurando usuário: " + (user != null ? user.getUsername() : "null"));
+        logger.info("ReportController configurando usuário: {}", user != null ? user.getUsername() : "null");
 
         if (user != null) {
             if (user.getRole() == Role.ADMIN) {
                 btnPersistencia.setVisible(true);
                 btnPersistencia.setManaged(true);
+                logger.debug("Botão de persistência visível para ADMIN: {}", user.getUsername());
             } else {
                 btnPersistencia.setVisible(false);
                 btnPersistencia.setManaged(false);
+                logger.debug("Botão de persistência oculto para usuário: {}", user.getUsername());
             }
         }
     }
@@ -60,26 +66,27 @@ public class ReportController {
     @FXML
     private void gerarResumo() {
         try {
-            System.out.println("gerarResumo() chamado!");
-            
-            // Verifica se o controller está disponível
+            logger.info("Gerando relatório resumido para usuário: {}", 
+                       usuarioLogado != null ? usuarioLogado.getUsername() : "desconhecido");
+
             if (academicController == null) {
                 academicController = ApplicationContext.getInstance().getAcademicController();
             }
-            
+
             if (academicController == null) {
+                logger.error("AcademicController não foi inicializado!");
                 resultadoArea.setText("Erro: AcademicController não foi inicializado!");
                 mostrarErro("AcademicController não foi inicializado!");
                 return;
             }
 
             String relatorio = academicController.generateSummary();
-            System.out.println("Relatório gerado com sucesso. Tamanho: " + relatorio.length());
-            
+            logger.info("Relatório resumido gerado com sucesso. Tamanho: {} caracteres", relatorio.length());
+
             resultadoArea.setText(relatorio);
-            
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao gerar relatório resumido: {}", e.getMessage(), e);
             resultadoArea.setText("Erro ao gerar relatório: " + e.getMessage());
             mostrarErro("Erro ao gerar relatório resumido: " + e.getMessage());
         }
@@ -88,25 +95,27 @@ public class ReportController {
     @FXML
     private void gerarPeso() {
         try {
-            System.out.println("gerarPeso() chamado!");
-            
+            logger.info("Gerando relatório de pesos para usuário: {}", 
+                       usuarioLogado != null ? usuarioLogado.getUsername() : "desconhecido");
+
             if (academicController == null) {
                 academicController = ApplicationContext.getInstance().getAcademicController();
             }
-            
+
             if (academicController == null) {
+                logger.error("AcademicController não foi inicializado!");
                 resultadoArea.setText("Erro: AcademicController não foi inicializado!");
                 mostrarErro("AcademicController não foi inicializado!");
                 return;
             }
 
             String relatorio = academicController.generateWeightReport();
-            System.out.println("Relatório de peso gerado com sucesso. Tamanho: " + relatorio.length());
-            
+            logger.info("Relatório de pesos gerado com sucesso. Tamanho: {} caracteres", relatorio.length());
+
             resultadoArea.setText(relatorio);
-            
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao gerar relatório de pesos: {}", e.getMessage(), e);
             resultadoArea.setText("Erro ao gerar relatório: " + e.getMessage());
             mostrarErro("Erro ao gerar relatório de peso: " + e.getMessage());
         }
@@ -115,32 +124,35 @@ public class ReportController {
     @FXML
     private void gerarPersistencia() {
         try {
-            System.out.println("gerarPersistencia() chamado!");
-            
+            logger.info("Gerando relatório de persistência para usuário: {}", 
+                       usuarioLogado != null ? usuarioLogado.getUsername() : "desconhecido");
+
             if (academicController == null) {
                 academicController = ApplicationContext.getInstance().getAcademicController();
             }
-            
+
             if (academicController == null) {
+                logger.error("AcademicController não foi inicializado!");
                 resultadoArea.setText("Erro: AcademicController não foi inicializado!");
                 mostrarErro("AcademicController não foi inicializado!");
                 return;
             }
 
-            // Verifica se o usuário é ADMIN
             if (usuarioLogado == null || usuarioLogado.getRole() != Role.ADMIN) {
+                logger.warn("Tentativa de acesso ao relatório de persistência por usuário não autorizado: {}", 
+                           usuarioLogado != null ? usuarioLogado.getUsername() : "null");
                 resultadoArea.setText("Acesso negado! Apenas administradores podem acessar este relatório.");
                 mostrarErro("Acesso negado! Apenas administradores podem acessar este relatório.");
                 return;
             }
 
             String relatorio = academicController.generatePersistenceConfigurationReport();
-            System.out.println("Relatório de persistência gerado com sucesso. Tamanho: " + relatorio.length());
-            
+            logger.info("Relatório de persistência gerado com sucesso. Tamanho: {} caracteres", relatorio.length());
+
             resultadoArea.setText(relatorio);
-            
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao gerar relatório de persistência: {}", e.getMessage(), e);
             resultadoArea.setText("Erro ao gerar relatório: " + e.getMessage());
             mostrarErro("Erro ao gerar relatório de persistência: " + e.getMessage());
         }
@@ -149,8 +161,9 @@ public class ReportController {
     @FXML
     private void voltar() {
         try {
-            System.out.println("voltar() chamado!");
-            
+            logger.info("Usuário {} voltando ao dashboard", 
+                       usuarioLogado != null ? usuarioLogado.getUsername() : "desconhecido");
+
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/fxml/dashboard.fxml")
             );
@@ -167,13 +180,17 @@ public class ReportController {
             stage.setTitle("Menu Principal");
             stage.show();
 
+            logger.info("Voltou ao dashboard com sucesso");
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao voltar: {}", e.getMessage(), e);
             mostrarErro("Erro ao voltar: " + e.getMessage());
         }
     }
 
     private void mostrarErro(String mensagem) {
+        logger.error("Erro no ReportController: {}", mensagem);
+        
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Erro");
         alert.setHeaderText(null);

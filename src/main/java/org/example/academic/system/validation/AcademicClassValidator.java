@@ -1,33 +1,44 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.validation;
 
-/**
- *
- * @author Gabi Caproni
- */
-
-import org.example.academic.system.exception.AcademicSystemException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import org.example.academic.system.exception.InvalidAcademicClassException;
 import org.example.academic.system.model.AcademicClass;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * TUS-2371 - Validate academic domain objects using Jakarta Bean Validation
+ * AC5: Regras declaradas com anotações Jakarta Bean Validation
+ * AC6: Lógica centralizada em componente reutilizável
+ * AC7: Erros convertidos em exceções de domínio
+ * AC8: Separado de Main e da camada de interface
+ */
 public class AcademicClassValidator {
+
+    private final Validator validator;
+
+    public AcademicClassValidator() {
+        ValidatorFactory factory =
+                Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
+    }
 
     public void validate(AcademicClass academicClass) {
 
-        if (academicClass.getCode() == null ||
-            academicClass.getCode().isBlank()) {
+        Set<ConstraintViolation<AcademicClass>> violations =
+                validator.validate(academicClass);
 
-            throw new AcademicSystemException(
-                    "Código da turma inválido.");
-        }
+        if (!violations.isEmpty()) {
 
-        if (academicClass.getName() == null ||
-            academicClass.getName().isBlank()) {
+            String messages = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining("; "));
 
-            throw new AcademicSystemException(
-                    "Nome da turma inválido.");
+            throw new InvalidAcademicClassException(messages);
         }
     }
 }

@@ -1,38 +1,44 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.validation;
 
-/**
- *
- * @author Gabi Caproni
- */
-
-import org.example.academic.system.exception.AcademicSystemException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import org.example.academic.system.exception.InvalidAssessmentException;
 import org.example.academic.system.model.Assessment;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * TUS-2371 - Validate academic domain objects using Jakarta Bean Validation
+ * AC5: Regras declaradas com anotações Jakarta Bean Validation
+ * AC6: Lógica centralizada em componente reutilizável
+ * AC7: Erros convertidos em exceções de domínio
+ * AC8: Separado de Main e da camada de interface
+ */
 public class AssessmentValidator {
+
+    private final Validator validator;
+
+    public AssessmentValidator() {
+        ValidatorFactory factory =
+                Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
+    }
 
     public void validate(Assessment assessment) {
 
-        if (assessment.getName() == null ||
-            assessment.getName().isBlank()) {
+        Set<ConstraintViolation<Assessment>> violations =
+                validator.validate(assessment);
 
-            throw new AcademicSystemException(
-                    "Nome da avaliação inválido.");
-        }
+        if (!violations.isEmpty()) {
 
-        if (assessment.getWeight() <= 0) {
+            String messages = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining("; "));
 
-            throw new AcademicSystemException(
-                    "Peso inválido.");
-        }
-
-        if (assessment.getValue() <= 0) {
-
-            throw new AcademicSystemException(
-                    "Valor inválido.");
+            throw new InvalidAssessmentException(messages);
         }
     }
 }

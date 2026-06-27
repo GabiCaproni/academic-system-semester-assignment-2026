@@ -1,39 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.academic.system.controller.AssessmentRegistrationController"
-      spacing="10"
-      alignment="CENTER">
+      spacing="15"
+      alignment="CENTER"
+      style="-fx-background-color: #f4f4f4; -fx-padding: 30;">
 
-    <Label text="Cadastro de Avaliação"/>
+    <Label text="📝 Cadastro de Avaliação" 
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+        <font>
+            <Font name="System Bold" size="22"/>
+        </font>
+    </Label>
 
-    <ComboBox fx:id="classCombo"/>
+    <Label text="Preencha os dados da avaliação" 
+           style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
 
-    <ComboBox fx:id="typeCombo"/>
+    <ComboBox fx:id="classCombo" 
+              promptText="Selecione uma turma"
+              prefWidth="300"
+              style="-fx-font-size: 14px;"/>
 
-    <TextField
-            fx:id="nameField"
-            promptText="Nome"/>
+    <ComboBox fx:id="typeCombo" 
+              promptText="Selecione o tipo"
+              prefWidth="300"
+              style="-fx-font-size: 14px;"/>
 
-    <TextField
-            fx:id="weightField"
-            promptText="Peso"/>
+    <TextField fx:id="nameField" 
+               promptText="Nome da avaliação"
+               prefWidth="300"
+               style="-fx-font-size: 14px;"/>
 
-    <TextField
-            fx:id="valueField"
-            promptText="Valor"/>
+    <TextField fx:id="weightField" 
+               promptText="Peso (ex: 30)"
+               prefWidth="300"
+               style="-fx-font-size: 14px;"/>
 
-    <Button
-            text="Cadastrar"
-            onAction="#cadastrarAvaliacao"/>
+    <TextField fx:id="valueField" 
+               promptText="Valor (ex: 100)"
+               prefWidth="300"
+               style="-fx-font-size: 14px;"/>
 
-    <Button
-            text="Voltar ao Menu"
-            onAction="#voltarDashboard"/>
+    <Button text="✅ Cadastrar Avaliação"
+            onAction="#cadastrarAvaliacao"
+            prefWidth="300"
+            style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
 
-    <Label fx:id="mensagemLabel"/>
+    <Label fx:id="mensagemLabel" 
+           style="-fx-font-size: 14px;" 
+           wrapText="true"/>
+
+    <Button text="🔙 Voltar ao Menu"
+            onAction="#voltarDashboard"
+            prefWidth="300"
+            style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
 
 </VBox>
