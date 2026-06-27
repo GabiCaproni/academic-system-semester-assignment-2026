@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.academic.system.controller.AssessmentRegistrationController"
+      spacing="10"
+      alignment="CENTER">
+
+    <Label text="Cadastro de Avaliação"/>
+
+    <ComboBox fx:id="classCombo"/>
+
+    <ComboBox fx:id="typeCombo"/>
+
+    <TextField
+            fx:id="nameField"
+            promptText="Nome"/>
+
+    <TextField
+            fx:id="weightField"
+            promptText="Peso"/>
+
+    <TextField
+            fx:id="valueField"
+            promptText="Valor"/>
+
+    <Button
+            text="Cadastrar"
+            onAction="#cadastrarAvaliacao"/>
+
+    <Button
+            text="Voltar ao Menu"
+            onAction="#voltarDashboard"/>
+
+    <Label fx:id="mensagemLabel"/>
+
+</VBox>

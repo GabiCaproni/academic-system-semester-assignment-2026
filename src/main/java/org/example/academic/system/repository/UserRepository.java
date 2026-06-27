@@ -30,7 +30,7 @@ public class UserRepository {
     }
 
     private void loadUsers() {
-        File file = new File("users.txt");
+        File file = new File("user.txt");
         System.out.println("Procurando arquivo em:");
         System.out.println(file.getAbsolutePath());
         System.out.println("Existe? " + file.exists());
