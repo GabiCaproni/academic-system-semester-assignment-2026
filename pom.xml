@@ -121,7 +121,7 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>
-                        org.example.academic.system.Main
+                        org.example.academic.system.view.AcademicSystemApplication
                     </mainClass>
                 </configuration>
             </plugin>
