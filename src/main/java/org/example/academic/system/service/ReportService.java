@@ -1,123 +1,179 @@
 package org.example.academic.system.service;
 
+import java.io.File;
+import java.util.Date;
 import java.util.List;
+
 import org.example.academic.system.model.AcademicClass;
 import org.example.academic.system.model.Assessment;
 import org.example.academic.system.security.SessionManager;
 
 public class ReportService {
 
-    private SessionManager sessionManager;
-    private ReportLogService logService;
+private final SessionManager sessionManager;
+private final ReportLogService logService;
 
-    public ReportService(
-            SessionManager sessionManager) {
+public ReportService(
+        SessionManager sessionManager) {
 
-        this.sessionManager = sessionManager;
-        this.logService = new ReportLogService();
-    }
+    this.sessionManager = sessionManager;
+    this.logService = new ReportLogService();
+}
 
-    public String generateSummary(
-            List<AcademicClass> classes) {
+public String generateSummary(
+        List<AcademicClass> classes) {
 
-        if (sessionManager != null
-                && sessionManager.isAuthenticated()) {
+    registerAccess("SUMMARY_REPORT");
 
-            logService.registerLog(
-                    "SUMMARY_REPORT",
-                    sessionManager
-                            .getLoggedUser()
-                            .getRole()
-                            .toString());
+    StringBuilder report =
+            new StringBuilder();
+
+    report.append("===== RELATÓRIO RESUMIDO =====\n\n");
+
+    for (AcademicClass c : classes) {
+
+        report.append("Turma: ")
+                .append(c.getCode())
+                .append(" - ")
+                .append(c.getName())
+                .append("\n");
+
+        for (Assessment a
+                : c.getAssessments()) {
+
+            report.append(a.getClass()
+                           .getSimpleName())
+                    .append(" | ")
+                    .append(a.getName())
+                    .append(" | Peso: ")
+                    .append(a.getWeight())
+                    .append(" | Valor: ")
+                    .append(a.getValue())
+                    .append("\n");
         }
 
-        StringBuilder report =
-                new StringBuilder();
+        report.append("\n");
+    }
 
-        for (AcademicClass c : classes) {
+    return report.toString();
+}
 
-            report.append("Turma: ")
-                    .append(c.getCode())
-                    .append(" - ")
-                    .append(c.getName())
+public String generateWeightReport(
+        List<AcademicClass> classes) {
+
+    registerAccess("WEIGHT_REPORT");
+
+    StringBuilder report =
+            new StringBuilder();
+
+    report.append("===== RELATÓRIO DE PESOS =====\n\n");
+
+    for (AcademicClass c : classes) {
+
+        report.append("Turma: ")
+                .append(c.getName())
+                .append("\n");
+
+        double totalWeight = 0;
+
+        for (Assessment a
+                : c.getAssessments()) {
+
+            report.append(a.getName())
+                    .append(" - Peso: ")
+                    .append(a.getWeight())
                     .append("\n");
 
-            for (Assessment a
-                    : c.getAssessments()) {
-
-                report.append(a.getClass()
-                               .getSimpleName())
-                        .append(" | ")
-                        .append(a.getName())
-                        .append(" | Peso: ")
-                        .append(a.getWeight())
-                        .append(" | Valor: ")
-                        .append(a.getValue())
-                        .append("\n");
-            }
-
-            report.append("\n");
+            totalWeight += a.getWeight();
         }
 
-        return report.toString();
+        report.append("Peso total: ")
+                .append(totalWeight)
+                .append("\n\n");
     }
 
-    public String generateWeightReport(
-            List<AcademicClass> classes) {
+    return report.toString();
+}
 
-        if (sessionManager != null
-                && sessionManager.isAuthenticated()) {
+public String generatePersistenceConfigurationReport() {
 
-            logService.registerLog(
-                    "WEIGHT_REPORT",
-                    sessionManager
-                            .getLoggedUser()
-                            .getRole()
-                            .toString());
-        }
+    registerAccess(
+            "PERSISTENCE_CONFIGURATION_REPORT");
 
-        StringBuilder report =
-                new StringBuilder();
+    StringBuilder report =
+            new StringBuilder();
 
-        for (AcademicClass c : classes) {
+    File jsonFile =
+            new File("academic_data.json");
 
-            report.append("Turma: ")
-                    .append(c.getName())
-                    .append("\n");
+    File xmlFile =
+            new File("academic_data.xml");
 
-            double totalWeight = 0;
+    report.append(
+            "===== RELATÓRIO DE PERSISTÊNCIA =====\n\n");
 
-            for (Assessment a : c.getAssessments()) {
+    report.append(
+            "Configuração atual: MEMORY\n\n");
 
-                report.append(a.getName())
-                        .append(" - Peso: ")
-                        .append(a.getWeight())
-                        .append("\n");
+    report.append(
+            "ARQUIVO JSON\n");
 
-                totalWeight += a.getWeight();
-            }
+    report.append("Existe: ")
+            .append(jsonFile.exists())
+            .append("\n");
 
-            report.append("Peso total: ")
-                    .append(totalWeight)
-                    .append("\n\n");
-        }
+    if (jsonFile.exists()) {
 
-        return report.toString();
+        report.append("Tamanho: ")
+                .append(jsonFile.length())
+                .append(" bytes\n");
+
+        report.append(
+                "Última modificação: ")
+                .append(
+                        new Date(
+                                jsonFile.lastModified()))
+                .append("\n");
     }
 
-    public String generatePersistenceConfigurationReport() {
+    report.append("\n");
 
-        if (sessionManager != null
-                && sessionManager.isAuthenticated()) {
+    report.append(
+            "ARQUIVO XML\n");
 
-            logService.registerLog(
-                    "PERSISTENCE_CONFIGURATION_REPORT",
-                    sessionManager
-                            .getLoggedUser()
-                            .getRole()
-                            .toString());
-        }
+    report.append("Existe: ")
+            .append(xmlFile.exists())
+            .append("\n");
 
-        return "Persistence Type: MEMORY";
+    if (xmlFile.exists()) {
+
+        report.append("Tamanho: ")
+                .append(xmlFile.length())
+                .append(" bytes\n");
+
+        report.append(
+                "Última modificação: ")
+                .append(
+                        new Date(
+                                xmlFile.lastModified()))
+                .append("\n");
     }
+
+    return report.toString();
+}
+
+private void registerAccess(
+        String reportType) {
+
+    if (sessionManager != null
+            && sessionManager.isAuthenticated()) {
+
+        logService.registerLog(
+                reportType,
+                sessionManager
+                        .getLoggedUser()
+                        .getRole()
+                        .toString());
+    }
+}
 }

@@ -4,220 +4,375 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import org.example.academic.system.context.ApplicationContext;
-import org.example.academic.system.model.*;
+import org.example.academic.system.model.AcademicClass;
+import org.example.academic.system.model.Assessment;
+import org.example.academic.system.model.Exam;
+import org.example.academic.system.model.PracticalAssignment;
+import org.example.academic.system.model.Seminar;
+import org.example.academic.system.model.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AssessmentRegistrationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AssessmentRegistrationController.class);
+private static final Logger logger =
+        LoggerFactory.getLogger(
+                AssessmentRegistrationController.class);
 
-    @FXML
-    private ComboBox<AcademicClass> classCombo;
+@FXML
+private ComboBox<AcademicClass> classCombo;
 
-    @FXML
-    private ComboBox<String> typeCombo;
+@FXML
+private ComboBox<String> typeCombo;
 
-    @FXML
-    private TextField nameField;
+@FXML
+private TextField nameField;
 
-    @FXML
-    private TextField weightField;
+@FXML
+private TextField weightField;
 
-    @FXML
-    private TextField valueField;
+@FXML
+private TextField valueField;
 
-    @FXML
-    private Label mensagemLabel;
+@FXML
+private Label campoExtraLabel;
 
-    private AcademicSystemController academicController;
-    private AuthenticationController authController;
-    private User usuarioLogado;
+@FXML
+private TextField campoExtraField;
 
-    @FXML
-    public void initialize() {
-        logger.info("Inicializando AssessmentRegistrationController...");
-        
-        // Carrega as turmas e tipos de avaliação
-        carregarTurmas();
-        carregarTiposAvaliacao();
-        
-        logger.info("AssessmentRegistrationController inicializado com sucesso");
+@FXML
+private Label mensagemLabel;
+
+private AcademicSystemController academicController;
+
+private AuthenticationController authController;
+
+private User usuarioLogado;
+
+@FXML
+public void initialize() {
+
+    carregarTurmas();
+    carregarTiposAvaliacao();
+
+    typeCombo.setOnAction(
+            event -> atualizarFormulario());
+}
+
+public void setAcademicController(
+        AcademicSystemController academicController) {
+
+    if (academicController == null) {
+
+        this.academicController =
+                ApplicationContext
+                        .getInstance()
+                        .getAcademicController();
+
+    } else {
+
+        this.academicController =
+                academicController;
     }
 
-    public void setAcademicController(AcademicSystemController academicController) {
+    carregarTurmas();
+}
+
+public void setAuthenticationController(
+        AuthenticationController authController) {
+
+    this.authController = authController;
+}
+
+public void configurarUsuario(
+        User usuario) {
+
+    this.usuarioLogado = usuario;
+}
+
+private void carregarTurmas() {
+
+    try {
+
         if (academicController == null) {
-            logger.warn("Assessment recebeu AcademicController NULL! Recuperando do ApplicationContext...");
-            this.academicController = ApplicationContext.getInstance().getAcademicController();
-            logger.info("Assessment recuperou AcademicController: {}", this.academicController);
-        } else {
-            this.academicController = academicController;
-            logger.debug("Assessment recebeu AcademicController: {}", academicController);
+            return;
         }
-        carregarTurmas();
+
+        classCombo.getItems().clear();
+
+        classCombo.getItems().addAll(
+                academicController.getClasses());
+
+    } catch (Exception e) {
+
+        logger.error(
+                "Erro ao carregar turmas",
+                e);
     }
+}
 
-    public void setAuthenticationController(AuthenticationController authController) {
-        this.authController = authController;
-        logger.debug("AuthenticationController configurado no AssessmentRegistrationController");
-    }
+private void carregarTiposAvaliacao() {
 
-    public void configurarUsuario(User usuario) {
-        this.usuarioLogado = usuario;
-        logger.info("AssessmentRegistrationController configurando usuário: {}", 
-                   usuario != null ? usuario.getUsername() : "null");
-    }
+    typeCombo.getItems().clear();
 
-    private void carregarTurmas() {
-        try {
-            if (academicController == null) {
-                logger.warn("AcademicController é NULL ao carregar turmas");
-                return;
-            }
-
-            classCombo.getItems().clear();
-            var classes = academicController.getClasses();
-            classCombo.getItems().addAll(classes);
-            
-            logger.info("Carregadas {} turmas para seleção", classes.size());
-            
-            if (classes.isEmpty()) {
-                logger.warn("Nenhuma turma disponível para cadastro de avaliação");
-                mensagemLabel.setText("Nenhuma turma cadastrada. Cadastre uma turma primeiro.");
-                mensagemLabel.setStyle("-fx-text-fill: orange;");
-            }
-
-        } catch (Exception e) {
-            logger.error("Erro ao carregar turmas: {}", e.getMessage(), e);
-        }
-    }
-
-    private void carregarTiposAvaliacao() {
-        typeCombo.getItems().clear();
-        typeCombo.getItems().addAll(
+    typeCombo.getItems().addAll(
             "PROVA",
-            "TRABALHO",
             "SEMINARIO",
-            "ASSIGNMENT"
-        );
-        logger.debug("Tipos de avaliação carregados: {}", typeCombo.getItems());
+            "TRABALHO PRATICO"
+    );
+}
+
+private void atualizarFormulario() {
+
+    String tipo = typeCombo.getValue();
+
+    campoExtraField.clear();
+
+    if (tipo == null) {
+
+        campoExtraLabel.setVisible(false);
+
+        campoExtraField.setVisible(false);
+        campoExtraField.setManaged(false);
+
+        return;
     }
 
-    @FXML
-    private void cadastrarAvaliacao() {
-        try {
-            logger.info("Usuário {} tentando cadastrar avaliação", 
-                       usuarioLogado != null ? usuarioLogado.getUsername() : "desconhecido");
+    switch (tipo) {
 
-            // Validação dos campos
-            if (classCombo.getValue() == null) {
-                mensagemLabel.setText("Selecione uma turma!");
-                mensagemLabel.setStyle("-fx-text-fill: red;");
-                logger.warn("Tentativa de cadastro sem selecionar turma");
-                return;
-            }
+        case "SEMINARIO" -> {
 
-            if (typeCombo.getValue() == null) {
-                mensagemLabel.setText("Selecione o tipo de avaliação!");
-                mensagemLabel.setStyle("-fx-text-fill: red;");
-                logger.warn("Tentativa de cadastro sem selecionar tipo");
-                return;
-            }
+            campoExtraLabel.setText("Tema");
 
-            AcademicClass turma = classCombo.getValue();
-            String tipo = typeCombo.getValue();
-            String nome = nameField.getText().trim();
-            
-            if (nome.isEmpty()) {
-                mensagemLabel.setText("Informe o nome da avaliação!");
-                mensagemLabel.setStyle("-fx-text-fill: red;");
-                logger.warn("Tentativa de cadastro com nome vazio");
-                return;
-            }
+            campoExtraLabel.setVisible(true);
 
-            double peso = Double.parseDouble(weightField.getText().trim());
-            double valor = Double.parseDouble(valueField.getText().trim());
+            campoExtraField.setPromptText(
+                    "Informe o tema do seminário");
 
-            if (peso <= 0 || valor <= 0) {
-                mensagemLabel.setText("Peso e valor devem ser maiores que zero!");
-                mensagemLabel.setStyle("-fx-text-fill: red;");
-                logger.warn("Tentativa de cadastro com peso/valor inválido: peso={}, valor={}", peso, valor);
-                return;
-            }
+            campoExtraField.setVisible(true);
+            campoExtraField.setManaged(true);
+        }
 
-            Assessment assessment;
-            switch (tipo) {
-                case "PROVA":
-                    assessment = new Exam(nome, peso, valor);
-                    break;
-                case "TRABALHO":
-                    assessment = new PracticalAssignment(nome, peso, valor, "Java");
-                    break;
-                case "SEMINARIO":
-                    assessment = new Seminar(nome, peso, valor, "Tema");
-                    break;
-                default:
-                    assessment = new Assignment(nome, peso, valor);
-            }
+        case "TRABALHO PRATICO" -> {
 
-            academicController.registerAssessment(turma, assessment);
+            campoExtraLabel.setText("Tecnologia");
 
-            mensagemLabel.setText("Avaliação cadastrada com sucesso!");
-            mensagemLabel.setStyle("-fx-text-fill: green;");
-            
-            logger.info("Avaliação '{}' cadastrada na turma {} com sucesso", 
-                       nome, turma.getCode());
+            campoExtraLabel.setVisible(true);
 
-            // Limpa os campos
-            nameField.clear();
-            weightField.clear();
-            valueField.clear();
-            classCombo.getSelectionModel().clearSelection();
-            typeCombo.getSelectionModel().selectFirst();
+            campoExtraField.setPromptText(
+                    "Ex: Java, Python, React");
 
-        } catch (NumberFormatException e) {
-            logger.warn("Erro de formato numérico: {}", e.getMessage());
-            mensagemLabel.setText("Peso e valor devem ser números válidos!");
-            mensagemLabel.setStyle("-fx-text-fill: red;");
-        } catch (Exception e) {
-            logger.error("Erro ao cadastrar avaliação: {}", e.getMessage(), e);
-            mensagemLabel.setText("Erro ao cadastrar: " + e.getMessage());
-            mensagemLabel.setStyle("-fx-text-fill: red;");
+            campoExtraField.setVisible(true);
+            campoExtraField.setManaged(true);
+        }
+
+        default -> {
+
+            campoExtraLabel.setVisible(false);
+
+            campoExtraField.setVisible(false);
+            campoExtraField.setManaged(false);
         }
     }
+}
 
-    @FXML
-    private void voltarDashboard() {
-        try {
-            logger.info("Usuário {} voltando ao dashboard", 
-                       usuarioLogado != null ? usuarioLogado.getUsername() : "desconhecido");
+@FXML
+private void cadastrarAvaliacao() {
 
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/dashboard.fxml")
-            );
-            Parent root = loader.load();
+    try {
 
-            DashboardController controller = loader.getController();
-            controller.configurarUsuario(usuarioLogado);
-            controller.setAcademicController(academicController);
-            controller.setAuthenticationController(authController);
+        if (classCombo.getValue() == null) {
 
-            Stage stage = (Stage) classCombo.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Menu Principal");
-            
-            logger.info("Dashboard carregado com sucesso");
+            mensagemLabel.setText(
+                    "Selecione uma turma!");
 
-        } catch (Exception e) {
-            logger.error("Erro ao voltar para dashboard: {}", e.getMessage(), e);
+            return;
         }
+
+        if (typeCombo.getValue() == null) {
+
+            mensagemLabel.setText(
+                    "Selecione um tipo!");
+
+            return;
+        }
+
+        AcademicClass turma =
+                classCombo.getValue();
+
+        String tipo =
+                typeCombo.getValue();
+
+        String nome =
+                nameField.getText().trim();
+
+        double peso =
+                Double.parseDouble(
+                        weightField.getText());
+
+        double valor =
+                Double.parseDouble(
+                        valueField.getText());
+
+        Assessment assessment;
+
+        switch (tipo) {
+
+            case "PROVA" -> {
+
+                assessment =
+                        new Exam(
+                                nome,
+                                peso,
+                                valor);
+            }
+
+            case "SEMINARIO" -> {
+
+                String tema =
+                        campoExtraField
+                                .getText()
+                                .trim();
+
+                if (tema.isEmpty()) {
+
+                    mensagemLabel.setText(
+                            "Informe o tema!");
+
+                    return;
+                }
+
+                assessment =
+                        new Seminar(
+                                nome,
+                                peso,
+                                valor,
+                                tema);
+            }
+
+            case "TRABALHO PRATICO" -> {
+
+                String tecnologia =
+                        campoExtraField
+                                .getText()
+                                .trim();
+
+                if (tecnologia.isEmpty()) {
+
+                    mensagemLabel.setText(
+                            "Informe a tecnologia!");
+
+                    return;
+                }
+
+                assessment =
+                        new PracticalAssignment(
+                                nome,
+                                peso,
+                                valor,
+                                tecnologia);
+            }
+
+            default ->
+                    throw new IllegalArgumentException(
+                            "Tipo inválido");
+        }
+
+        academicController.registerAssessment(
+                turma,
+                assessment);
+
+        mensagemLabel.setText(
+                "Avaliação cadastrada com sucesso!");
+
+        limparCampos();
+
+    } catch (NumberFormatException e) {
+
+        mensagemLabel.setText(
+                "Peso e valor devem ser numéricos!");
+
+    } catch (Exception e) {
+
+        mensagemLabel.setText(
+                "Erro: " + e.getMessage());
+
+        logger.error(
+                "Erro ao cadastrar avaliação",
+                e);
     }
+}
+
+private void limparCampos() {
+
+    nameField.clear();
+    weightField.clear();
+    valueField.clear();
+
+    campoExtraField.clear();
+
+    classCombo.getSelectionModel()
+            .clearSelection();
+
+    typeCombo.getSelectionModel()
+            .clearSelection();
+
+    campoExtraField.setVisible(false);
+    campoExtraField.setManaged(false);
+
+    campoExtraLabel.setVisible(false);
+}
+
+@FXML
+private void voltarDashboard() {
+
+    try {
+
+        FXMLLoader loader =
+                new FXMLLoader(
+                        getClass()
+                                .getResource(
+                                        "/fxml/dashboard.fxml"));
+
+        Parent root =
+                loader.load();
+
+        DashboardController controller =
+                loader.getController();
+
+        controller.configurarUsuario(
+                usuarioLogado);
+
+        controller.setAcademicController(
+                academicController);
+
+        controller.setAuthenticationController(
+                authController);
+
+        Stage stage =
+                (Stage) classCombo
+                        .getScene()
+                        .getWindow();
+
+        stage.setScene(
+                new Scene(root));
+
+        stage.setTitle(
+                "Menu Principal");
+
+    } catch (Exception e) {
+
+        logger.error(
+                "Erro ao voltar",
+                e);
+    }
+}
+
 }

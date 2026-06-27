@@ -1,73 +1,55 @@
 package org.example.academic.system.model;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import org.example.academic.system.exception.InvalidAcademicClassException;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Setter;
 
+@Getter
+@Setter
+@EqualsAndHashCode(of = "code")
 public class AcademicClass {
 
-    @NotBlank(message = "Código da turma é obrigatório.")
-    private String code;
+@NotBlank(message = "Código da turma é obrigatório.")
+private final String code;
 
-    @NotBlank(message = "Nome da turma é obrigatório.")
-    private String name;
+@NotBlank(message = "Nome da turma é obrigatório.")
+private final String name;
 
-    private List<Assessment> assessments;
+private final List<Assessment> assessments;
 
-    public AcademicClass(String code, String name) {
+public AcademicClass(String code, String name) {
 
-        if (code == null || code.isBlank()) {
-            throw new InvalidAcademicClassException(
-                    "Código da turma é obrigatório.");
-        }
-
-        if (name == null || name.isBlank()) {
-            throw new InvalidAcademicClassException(
-                    "Nome da turma é obrigatório.");
-        }
-
-        this.code = code;
-        this.name = name;
-        this.assessments = new ArrayList<>();
+    if (code == null || code.isBlank()) {
+        throw new InvalidAcademicClassException(
+                "Código da turma é obrigatório.");
     }
 
-    public void addAssessment(Assessment assessment) {
-        assessments.add(assessment);
+    if (name == null || name.isBlank()) {
+        throw new InvalidAcademicClassException(
+                "Nome da turma é obrigatório.");
     }
 
-    public String getCode() {
-        return code;
-    }
+    this.code = code;
+    this.name = name;
+    this.assessments = new ArrayList<>();
+}
 
-    public String getName() {
-        return name;
-    }
+public void addAssessment(
+        Assessment assessment) {
 
-    public List<Assessment> getAssessments() {
-        return assessments;
-    }
+    assessments.add(assessment);
+}
 
-    @Override
-    public String toString() {
-        return code + " - " + name;
-    }
+@Override
+public String toString() {
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        AcademicClass other = (AcademicClass) obj;
-        return code.equals(other.code);
-    }
+    return code + " - " + name;
+}
 
-    @Override
-    public int hashCode() {
-        return code.hashCode();
-    }
 }

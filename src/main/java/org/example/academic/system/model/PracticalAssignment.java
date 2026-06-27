@@ -1,15 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.example.academic.system.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class PracticalAssignment extends Assessment {
 
-    private String technology;
+private String technology;
 
-    public PracticalAssignment(String name, double weight, double value, String technology) {
-        super(name, weight, value);
-        this.technology = technology;
-    }
+public PracticalAssignment(String name,double weight,double value, String technology) {
+    super(name, weight, value);
+    this.technology = technology;
+}
+
 }
